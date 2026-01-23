@@ -1,5 +1,5 @@
 
-# Variables Globales
+# Diccionarios -------------------------------------------------------------------------------------------------
 ascii_256 = {
     '\x00': 0, '\x01': 1, '\x02': 2, '\x03': 3, '\x04': 4, '\x05': 5, '\x06': 6, '\x07': 7,
     '\x08': 8, '\t': 9, '\n': 10, '\x0b': 11, '\x0c': 12, '\r': 13, '\x0e': 14, '\x0f': 15,
@@ -34,6 +34,26 @@ ascii_256 = {
     '≡': 240, '±': 241, '‗': 242, '¾': 243, '¶': 244, '§': 245, '÷': 246, '¸': 247,
     '°': 248, '¨': 249, '·': 250, '¹': 251, '³': 252, '²': 253, '■': 254, '\xa0': 255
 }
+
+base64_dict = {
+    'A': 0,  'B': 1,  'C': 2,  'D': 3,  'E': 4,  'F': 5,  'G': 6,  'H': 7,
+    'I': 8,  'J': 9,  'K': 10, 'L': 11, 'M': 12, 'N': 13, 'O': 14, 'P': 15,
+    'Q': 16, 'R': 17, 'S': 18, 'T': 19, 'U': 20, 'V': 21, 'W': 22, 'X': 23,
+    'Y': 24, 'Z': 25,
+
+    'a': 26, 'b': 27, 'c': 28, 'd': 29, 'e': 30, 'f': 31,
+    'g': 32, 'h': 33, 'i': 34, 'j': 35, 'k': 36, 'l': 37,
+    'm': 38, 'n': 39, 'o': 40, 'p': 41, 'q': 42, 'r': 43,
+    's': 44, 't': 45, 'u': 46, 'v': 47, 'w': 48, 'x': 49,
+    'y': 50, 'z': 51,
+
+    '0': 52, '1': 53, '2': 54, '3': 55, '4': 56,
+    '5': 57, '6': 58, '7': 59, '8': 60, '9': 61,
+
+    '+': 62, '/': 63
+}
+
+## Helpers -------------------------------------------------------------------------------------------------
 # A la función le entra un número y lo convierte a binario con el algoritmó básico 
 def num_to_binario(num):
     if num == 0:
@@ -47,6 +67,10 @@ def num_to_binario(num):
 
 def binario_to_num(binario):
     return int(binario, 2)
+
+# Conversores -------------------------------------------------------------------------------------------------
+
+# Conversor binario-texto y texto-binario----------------------------------------------------------------------
 
 # Convierte texto a binario, va caracter por caracter y luego obtiene el valor en ASCII con el diccionario y 
 # luego con la función lo pasa a binario y acumula los binarios en la var binario
@@ -71,7 +95,32 @@ def binario_to_text(binario):
                 texto += char
                 break
     return texto
+# Conversor base64-texto y texto-base64----------------------------------------------------------------------
 
+def text_to_base64(texto):
+    base64_str = ''
+    for char in texto:
+        ascii_val = ascii_256.get(char, 0)
+        base64_char = ''
+        while ascii_val > 0:
+            base64_char = list(base64_dict.keys())[list(base64_dict.values()).index(ascii_val % 64)] + base64_char
+            ascii_val //= 64  
+        base64_char = base64_char.zfill(2)  # Asegurar que cada caracter tenga al menos 2 caracteres en base64
+        base64_str += base64_char + ' '
+    return base64_str.strip()
+
+def base64_to_text(base64_str):
+    texto = ''
+    base64_chars = base64_str.split(' ')
+    for base64_char in base64_chars:
+        ascii_val = 0
+        for i, char in enumerate(reversed(base64_char)):
+            ascii_val += base64_dict.get(char, 0) * (64 ** i)
+        for char, val in ascii_256.items():
+            if val == ascii_val:
+                texto += char
+                break
+    return texto
 # Función principal para probar las conversiones
 def main():
     texto = "Hola, Mundo!"
