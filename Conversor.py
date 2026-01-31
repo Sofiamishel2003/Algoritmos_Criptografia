@@ -121,6 +121,72 @@ def base64_to_text(base64_str):
                 texto += char
                 break
     return texto
+
+# Conversor base64-binario y binario-base64----------------------------------------------------------------------
+def base64_to_binario(base64_str):
+    texto = base64_to_text(base64_str)
+    binario = text_to_binario(texto)
+    return binario
+def binario_to_base64(binario):
+    texto = binario_to_text(binario)
+    base64_str = text_to_base64(texto)
+    return base64_str
+# Menú en consola ------------------------------------------------------------------------------------------
+def menu():
+    while True:
+        print("\n==================== MENÚ ====================")
+        print("1) ASCII  -> BINARIO")
+        print("2) BINARIO -> ASCII")
+        print("3) ASCII  -> BASE64 (pasando por BINARIO)")
+        print("4) BASE64 -> ASCII (pasando por BINARIO)")
+        print("5) BASE64 -> BINARIO")
+        print("6) BINARIO -> BASE64")
+        print("7) XOR (BINARIO XOR BINARIO)")
+        print("0) Salir")
+        print("=============================================")
+
+        op = input("Elige una opción: ").strip()
+
+        try:
+            if op == "1":
+                texto = input("Ingresa texto ASCII: ")
+                print("Resultado BINARIO:", text_to_binario(texto))
+
+            elif op == "2":
+                b = input("Ingresa binario (con o sin espacios): ")
+                print("Resultado ASCII:", binario_to_text(b))
+
+            elif op == "3":
+                texto = input("Ingresa texto ASCII: ")
+                print("Resultado BASE64:", text_to_base64(texto))
+
+            elif op == "4":
+                b64 = input("Ingresa BASE64: ")
+                # pasa por binario internamente
+                print("Resultado ASCII:", base64_to_text(b64))
+
+            elif op == "5":
+                b64 = input("Ingresa BASE64: ")
+                print("Resultado BINARIO:", base64_to_binario(b64))
+                
+            elif op == "6":
+                b = input("Ingresa BINARIO (con o sin espacios): ")
+                print("Resultado BASE64:", binario_to_base64(b))
+
+            elif op == "7":
+                b1 = input("Ingresa BINARIO 1: ")
+                b2 = input("Ingresa BINARIO 2: ")
+                break
+            elif op == "0":
+                print("Saliendo...")
+                break
+
+            else:
+                print("Opción inválida. Intenta de nuevo.")
+
+        except Exception as e:
+            print("Error:", e)
+
 # Función principal para probar las conversiones
 def main():
     texto = "Hola, Mundo!"
