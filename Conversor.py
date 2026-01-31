@@ -151,12 +151,26 @@ def base64_to_text(base64_str):
 
 # Conversor base64-binario y binario-base64----------------------------------------------------------------------
 def base64_to_binario(base64_str):
-    texto = base64_to_text(base64_str)
-    binario = text_to_binario(texto)
-    return binario
+    binario_completo = ''
+    # Convertimos los caracteres a su representación numérica Asciia
+    for char in base64_str:
+        # Convertimos el char ascci a número base64
+        base64_val = base64_dict.get(char, 0)
+        # Convertimos el número base64 a binario
+        binary_val = num_to_binario(base64_val)
+        #binary_val = binary_val[2:] # Le quitamos 2 bits porque la función me devuelve 8 bits y en base64 solo ocupamos 6
+        binario_completo += binary_val +" "
+    return binario_completo
+
 def binario_to_base64(binario):
-    texto = binario_to_text(binario)
-    base64_str = text_to_base64(texto)
+    base64_inv = {v:k for k,v in base64_dict.items()}
+    binario_completo = binario.split(' ')
+    base64_str = ''
+    # Convertir bloques a base 64
+    for bloque in binario_completo:
+        num= binario_to_decimal(bloque)
+        print(num)
+        base64_str+=base64_inv.get(num,'') + ' '
     return base64_str
 # Menú en consola ------------------------------------------------------------------------------------------
 def menu():
@@ -180,7 +194,7 @@ def menu():
                 print("Resultado BINARIO:", text_to_binario(texto))
 
             elif op == "2":
-                b = input("Ingresa binario (con o sin espacios): ")
+                b = input("Ingresa binario (con espacios): ")
                 print("Resultado ASCII:", binario_to_text(b))
 
             elif op == "3":
@@ -197,7 +211,7 @@ def menu():
                 print("Resultado BINARIO:", base64_to_binario(b64))
 
             elif op == "6":
-                b = input("Ingresa BINARIO (con o sin espacios): ")
+                b = input("Ingresa BINARIO (con espacios): ")
                 print("Resultado BASE64:", binario_to_base64(b))
 
             elif op == "7":
