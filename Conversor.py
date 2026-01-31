@@ -63,10 +63,23 @@ def num_to_binario(num):
         bits.append(str(num % 2))
         num //= 2
     bits.reverse()
-    return ''.join(bits)
+    bits = ''.join(bits).zfill(8)
+    return bits
 
 def binario_to_num(binario):
     return int(binario, 2)
+
+def binario_to_decimal(bin_str: str) -> int:
+    # Limpia espacios y valida que solo haya 0/1
+    b = ''.join(c for c in bin_str.strip() if c in '01')
+    print(b)
+    valor = 0
+    n = len(b)
+    for i, bit in enumerate(b):
+        if bit == '1':
+            valor += 2 ** (n - 1 - i)
+    return valor
+
 
 # Conversores -------------------------------------------------------------------------------------------------
 
@@ -79,7 +92,6 @@ def text_to_binario(texto):
     for char in texto:
         ascii_val = ascii_256.get(char, 0)  # Obtener el valor ASCII, 0 si no se encuentra
         bin_char = num_to_binario(ascii_val)
-        bin_char = bin_char.zfill(8)  # ver qué el char tenga 8 bits
         binario += bin_char + ' '  # Separar los binarios con un espacio
     return binario.strip()  # Eliminar el espacio final
 
@@ -95,31 +107,46 @@ def binario_to_text(binario):
                 texto += char
                 break
     return texto
+
 # Conversor base64-texto y texto-base64----------------------------------------------------------------------
 
 def text_to_base64(texto):
+    base64_inv = {v:k for k,v in base64_dict.items()}
     base64_str = ''
+    binario_completo = ''
+    # Convertimos los caracteres a su representación numérica Asciia
     for char in texto:
         ascii_val = ascii_256.get(char, 0)
-        base64_char = ''
-        while ascii_val > 0:
-            base64_char = list(base64_dict.keys())[list(base64_dict.values()).index(ascii_val % 64)] + base64_char
-            ascii_val //= 64  
-        base64_char = base64_char.zfill(2)  # Asegurar que cada caracter tenga al menos 2 caracteres en base64
-        base64_str += base64_char + ' '
-    return base64_str.strip()
+        # Convertimos el número Ascii a binario
+        binary_val = num_to_binario(ascii_val)
+        binario_completo+= binary_val
+    while len(binario_completo) % 6 != 0:
+        binario_completo += '0'  # Rellenar con ceros para completar bloques de 6 bits
+    # Agrupar en bloques de 6 bits
+    binario_completo = [binario_completo[i:i+6] for i in range(0, len(binario_completo), 6)]
+    # Convertir bloques a base 64
+    for bloque in binario_completo:
+        num= binario_to_decimal(bloque)
+        print(num)
+        base64_str+=base64_inv.get(num,'') + ' '
+    return base64_str
 
 def base64_to_text(base64_str):
     texto = ''
-    base64_chars = base64_str.split(' ')
-    for base64_char in base64_chars:
-        ascii_val = 0
-        for i, char in enumerate(reversed(base64_char)):
-            ascii_val += base64_dict.get(char, 0) * (64 ** i)
-        for char, val in ascii_256.items():
-            if val == ascii_val:
-                texto += char
-                break
+    binario_completo = ''
+    # Convertimos los caracteres a su representación numérica Asciia
+    for char in base64_str:
+        # Convertimos el char ascci a número base64
+        base64_val = base64_dict.get(char, 0)
+        # Convertimos el número base64 a binario
+        binary_val = num_to_binario(base64_val)
+        binary_val = binary_val[2:] # Le quitamos 2 bits porque la función me devuelve 8 bits y en base64 solo ocupamos 6
+        binario_completo += binary_val
+    # Agrupar en bloques de 8 bits
+    binario_completo = [binario_completo[i:i+8] for i in range(0, len(binario_completo), 8)]
+    # Convertir bloques a texto
+    for bloque in binario_completo:
+        texto += binario_to_text(bloque)
     return texto
 
 # Conversor base64-binario y binario-base64----------------------------------------------------------------------
@@ -168,7 +195,7 @@ def menu():
             elif op == "5":
                 b64 = input("Ingresa BASE64: ")
                 print("Resultado BINARIO:", base64_to_binario(b64))
-                
+
             elif op == "6":
                 b = input("Ingresa BINARIO (con o sin espacios): ")
                 print("Resultado BASE64:", binario_to_base64(b))
@@ -199,4 +226,4 @@ def main():
     print("Binario a texto:", texto_recuperado)
 
 if __name__ == "__main__":
-    main()
+    menu()
