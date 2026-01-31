@@ -80,7 +80,6 @@ def binario_to_decimal(bin_str: str) -> int:
             valor += 2 ** (n - 1 - i)
     return valor
 
-
 # Conversores -------------------------------------------------------------------------------------------------
 
 # Conversor binario-texto y texto-binario----------------------------------------------------------------------
@@ -172,6 +171,23 @@ def binario_to_base64(binario):
         print(num)
         base64_str+=base64_inv.get(num,'') + ' '
     return base64_str
+
+def xor_binario(binario: str) -> str:
+    b = ''.join(c for c in binario if c in '01')
+    resultado = ''
+    for bit in b:
+        # XOR con 1
+        if bit == '1':
+            resultado += '0'
+        else:
+            resultado += '1'
+    if len(resultado) % 8 == 0:
+        resultado = ' '.join(
+            resultado[i:i+8] for i in range(0, len(resultado), 8)
+        )
+
+    return resultado
+
 # Menú en consola ------------------------------------------------------------------------------------------
 def menu():
     while True:
@@ -215,9 +231,9 @@ def menu():
                 print("Resultado BASE64:", binario_to_base64(b))
 
             elif op == "7":
-                b1 = input("Ingresa BINARIO 1: ")
-                b2 = input("Ingresa BINARIO 2: ")
-                break
+                b1 = input("Ingresa BINARIO: ")
+                xor_binario1 = xor_binario(b1)
+                print("Resultado XOR de BINARIO:", xor_binario1)
             elif op == "0":
                 print("Saliendo...")
                 break
