@@ -26,6 +26,65 @@ def cesar_descifrar(mensaje: str, desplazamiento: int) -> str:
 
 def rot13(mensaje: str) -> str:
     return cesar_cifrar(mensaje, 13)
+
+# 2) Cifrado Vigenère
+def crear_matriz_vigenere():
+    matriz = []
+    n = len(ALFABETO_MAY)
+
+    for i in range(n):
+        fila = ""
+        for j in range(n):
+            fila += ALFABETO_MAY[(i + j) % n]
+        matriz.append(fila)
+
+    return matriz
+
+def vigenere_cifrar(mensaje: str, clave: str) -> str:
+    matriz = crear_matriz_vigenere()
+    cifrado = ""
+    clave = clave.upper()
+    clave_len = len(clave)
+    clave_idx = 0
+
+    for char in mensaje:
+        if char in ALFABETO_MAY:
+            fila = ALFABETO_MAY.index(clave[clave_idx % clave_len])
+            col = ALFABETO_MAY.index(char)
+            cifrado += matriz[fila][col]
+            clave_idx += 1
+        elif char in ALFABETO_MIN:
+            fila = ALFABETO_MAY.index(clave[clave_idx % clave_len])
+            col = ALFABETO_MIN.index(char)
+            cifrado += matriz[fila][col].lower()
+            clave_idx += 1
+        else:
+            cifrado += char  # No modificar caracteres no alfabéticos
+
+    return cifrado
+
+def vigenere_descifrar(mensaje: str, clave: str) -> str:
+    matriz = crear_matriz_vigenere()
+    mensaje = mensaje.upper()
+    clave = clave.upper()
+    resultado = ""
+    k = 0
+    for ch in mensaje:
+        if ch in ALFABETO_MAY:
+            fila = ALFABETO_MAY.index(clave[k % len(clave)])
+
+            # Buscar la columna donde aparece el caracter cifrado
+            for col in range(len(ALFABETO_MAY)):
+                if matriz[fila][col] == ch:
+                    resultado += ALFABETO_MAY[col]
+                    break
+
+            k += 1
+        else:
+            resultado += ch
+
+    return resultado
+
 def menu():
     while True:
         print("\n================== CIFRADOS HISTÓRICOS ==================")
@@ -57,12 +116,12 @@ def menu():
             elif op == "4":
                 msg = input("Mensaje: ")
                 key = input("Clave alfabética: ")
-                #print("Cifrado:", vigenere_cifrar(msg, key))
+                print("Cifrado:", vigenere_cifrar(msg, key))
 
             elif op == "5":
                 msg = input("Mensaje: ")
                 key = input("Clave alfabética: ")
-                #print("Descifrado:", vigenere_descifrar(msg, key))
+                print("Descifrado:", vigenere_descifrar(msg, key))
 
             elif op == "6":
                 msg = input("Mensaje: ")
