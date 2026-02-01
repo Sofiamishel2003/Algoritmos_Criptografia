@@ -24,7 +24,8 @@ def cesar_descifrar(mensaje: str, desplazamiento: int) -> str:
     # Descifrar = cifrar con desplazamiento negativo
     return cesar_cifrar(mensaje, -desplazamiento)
 
-
+def rot13(mensaje: str) -> str:
+    return cesar_cifrar(mensaje, 13)
 def menu():
     while True:
         print("\n================== CIFRADOS HISTÓRICOS ==================")
@@ -51,7 +52,7 @@ def menu():
 
             elif op == "3":
                 msg = input("Mensaje: ")
-                #print("ROT13:", rot13(msg))
+                print("ROT13:", rot13(msg))
 
             elif op == "4":
                 msg = input("Mensaje: ")
