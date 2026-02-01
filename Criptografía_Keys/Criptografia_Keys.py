@@ -107,3 +107,31 @@ def hex_to_bytes(hex_str: str):
         out.append(hex2_to_byte(h[i], h[i+1]))
     return out
 
+
+# PRNG para generar llaves dinámicas
+
+# Semilla a partir de texto ASCII (guarda bytes cin mod 2^32)
+def _seed_from_ascii_text(seed_text: str) -> int:
+    sbytes = text_to_bytes_ascii256(seed_text)
+    seed = 0
+    for b in sbytes:
+        seed = (seed * 131 + b) % (2**32)
+    if seed == 0:
+        seed = 1
+    return seed
+
+# LCG state' = (a*state + c) mod 2^32
+def lcg_next(state: int) -> int:
+    a = 1664525
+    c = 1013904223
+    m = 2**32
+    return (a * state + c) % m
+
+# Genera n bytes ALEATORIOS usando LCG
+def prng_bytes(seed: int, n: int):
+    out = []
+    state = seed
+    for _ in range(n):
+        state = lcg_next(state)
+        out.append(state % 256)
+    return out
