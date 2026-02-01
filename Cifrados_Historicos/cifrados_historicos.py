@@ -84,6 +84,45 @@ def vigenere_descifrar(mensaje: str, clave: str) -> str:
             resultado += ch
 
     return resultado
+# 3) Análisis de frecuencias
+def analisis_frecuencia(mensaje: str):
+    #  Lista de conteos de letras 
+    conteos = {}
+    for letra in ALFABETO_MAY:
+        conteos[letra] = 0
+    total_letras = 0
+    mensaje = mensaje.upper()
+    # Contar frecuencias
+    for char in mensaje:
+        if char in ALFABETO_MAY:
+            conteos[char] += 1
+            total_letras += 1
+    # Convertir a lista para ordenar
+    tabla = []
+    for letra in ALFABETO_MAY:
+        if total_letras > 0:
+            porcentaje = (conteos[letra] / total_letras) * 100
+        else:
+            porcentaje = 0
+        tabla.append((letra, conteos[letra], porcentaje))
+    # Ordenar manualmente por frecuencia
+    n = len(tabla)
+    for i in range(n):
+        for j in range(0, n - 1 - i):
+            if tabla[j][1] < tabla[j + 1][1]:
+                tabla[j], tabla[j + 1] = tabla[j + 1], tabla[j]
+    return tabla
+
+def imprimir_tabla_frecuencia(tabla):
+    print("\nTabla de frecuencia de caracteres")
+    print(f"{'Letra':<8} {'Conteo':<8} {'Porcentaje':<10}")
+    print("-" * 30)
+
+    for letra, conteo, porcentaje in tabla:
+        if conteo > 0:
+            print(f"{letra:<8} {conteo:<8} {porcentaje:>7.2f}%")
+
+    print("-" * 30)
 
 def menu():
     while True:
@@ -125,8 +164,8 @@ def menu():
 
             elif op == "6":
                 msg = input("Mensaje: ")
-                #tabla = analisis_frecuencia(msg)
-                #imprimir_tabla_frecuencia(tabla)
+                tabla = analisis_frecuencia(msg)
+                imprimir_tabla_frecuencia(tabla)
 
             elif op == "0":
                 print("Saliendo...")
