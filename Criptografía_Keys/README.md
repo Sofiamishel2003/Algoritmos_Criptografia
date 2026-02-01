@@ -1,4 +1,4 @@
-# 🔐 Stream Cipher Manual en ASCII (Python)
+# 🔐 Stream Cipher Manual en ASCII
 
 ## 📌 Descripción general
 
