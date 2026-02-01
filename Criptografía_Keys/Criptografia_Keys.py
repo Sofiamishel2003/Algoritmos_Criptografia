@@ -66,3 +66,44 @@ def xor_bytes_lists(a, b):
     for i in range(len(a)):
         out.append(a[i] ^ b[i])
     return out
+
+# Transformaciones HEX a bytes y viceversa
+
+HEX_CHARS = "0123456789ABCDEF"
+
+def byte_to_hex2(n: int) -> str:
+    if n < 0 or n > 255:
+        raise ValueError("byte_to_hex2 espera 0..255")
+    hi = n // 16
+    lo = n % 16
+    return HEX_CHARS[hi] + HEX_CHARS[lo]
+
+
+def hex2_to_byte(h1: str, h2: str) -> int:
+    def val(c):
+        c = c.upper()
+        if c in "0123456789":
+            return ord(c) - ord('0')
+        if c in "ABCDEF":
+            return 10 + (ord(c) - ord('A'))
+        raise ValueError(f"Hex inválido: {c}")
+
+    return val(h1) * 16 + val(h2)
+
+
+def bytes_to_hex(byte_list) -> str:
+    s = ""
+    for b in byte_list:
+        s += byte_to_hex2(b)
+    return s
+
+
+def hex_to_bytes(hex_str: str):
+    h = "".join(ch for ch in hex_str.strip() if ch != " ")
+    if len(h) % 2 != 0:
+        raise ValueError("Hex inválido: longitud impar")
+    out = []
+    for i in range(0, len(h), 2):
+        out.append(hex2_to_byte(h[i], h[i+1]))
+    return out
+
