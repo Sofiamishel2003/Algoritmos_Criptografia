@@ -135,3 +135,129 @@ def prng_bytes(seed: int, n: int):
         state = lcg_next(state)
         out.append(state % 256)
     return out
+
+
+# Generación de llaves dinámicas ASCII -------------------------------------------------------------------
+
+def generar_llave_dinamica_ascii(longitud: int, seed_text: str):
+    if longitud <= 0:
+        raise ValueError("La longitud debe ser > 0")
+    seed = _seed_from_ascii_text(seed_text)
+    key_bytes = prng_bytes(seed, longitud)
+    return bytes_to_text_ascii256(key_bytes)
+
+
+# Stream cipher con llave k (repite la k hasta el tamaño del mensaje) ---------------------------------------
+def keystream_llave_fija(key_text: str, n: int):
+    k = text_to_bytes_ascii256(key_text)
+    if len(k) == 0:
+        raise ValueError("Llave fija vacía")
+    out = []
+    i = 0
+    while len(out) < n:
+        out.append(k[i % len(k)])
+        i += 1
+    return out
+
+# Cifra y devuelve ciphertext en HEX
+def cifrar_k_fija_hex(plaintext: str, key_text: str) -> str:
+    pt = text_to_bytes_ascii256(plaintext)
+    ks = keystream_llave_fija(key_text, len(pt))
+    ct = xor_bytes_lists(pt, ks)
+    return bytes_to_hex(ct)
+
+
+def descifrar_k_fija_hex(cipher_hex: str, key_text: str) -> str:
+    ct = hex_to_bytes(cipher_hex)
+    ks = keystream_llave_fija(key_text, len(ct))
+    pt = xor_bytes_lists(ct, ks)
+    return bytes_to_text_ascii256(pt)
+
+
+# Stream cipher con llave k dinámica (keystream del tamaño del mensaje) ---------------------------------------
+
+def keystream_dinamico(master_key_text: str, nonce_text: str, n: int):
+    seed = _seed_from_ascii_text(master_key_text + "|" + nonce_text)
+    return prng_bytes(seed, n)
+
+
+def cifrar_k_dinamica_hex(plaintext: str, master_key_text: str, nonce_text: str) -> str:
+    pt = text_to_bytes_ascii256(plaintext)
+    ks = keystream_dinamico(master_key_text, nonce_text, len(pt))
+    ct = xor_bytes_lists(pt, ks)
+    return bytes_to_hex(ct)
+
+
+def descifrar_k_dinamica_hex(cipher_hex: str, master_key_text: str, nonce_text: str) -> str:
+    ct = hex_to_bytes(cipher_hex)
+    ks = keystream_dinamico(master_key_text, nonce_text, len(ct))
+    pt = xor_bytes_lists(ct, ks)
+    return bytes_to_text_ascii256(pt)
+
+
+# Menú en consola ------------------------------------------------------------------------------------------
+
+def menu():
+    while True:
+        print("\n==================== STREAM CIPHER (MANUAL) ====================")
+        print("1) Generar llave dinámica ASCII (texto) desde una semilla")
+        print("2) Cifrar  (k fija)    -> ciphertext HEX (ASCII)")
+        print("3) Descifrar(k fija)    -> plaintext")
+        print("4) Cifrar  (k dinámica) -> ciphertext HEX (ASCII)")
+        print("5) Descifrar(k dinámica) -> plaintext")
+        print("0) Salir")
+        print("=================================================================")
+
+        op = input("Elige una opción: ").strip()
+
+        try:
+            if op == "1":
+                seed_text = input("Ingresa semilla (texto ASCII-256 según tu diccionario): ")
+                longitud = int(input("Longitud de llave a generar: ").strip())
+                llave = generar_llave_dinamica_ascii(longitud, seed_text)
+                print("Llave dinámica generada:")
+                print(llave)
+
+            elif op == "2":
+                pt = input("Plaintext: ")
+                k = input("Llave fija (k): ")
+                ct_hex = cifrar_k_fija_hex(pt, k)
+                print("Ciphertext (HEX ASCII):")
+                print(ct_hex)
+
+            elif op == "3":
+                ct_hex = input("Ciphertext HEX: ")
+                k = input("Llave fija (k): ")
+                pt = descifrar_k_fija_hex(ct_hex, k)
+                print("Plaintext:")
+                print(pt)
+
+            elif op == "4":
+                pt = input("Plaintext: ")
+                master = input("Master key: ")
+                nonce = input("Nonce (recomendado distinto por mensaje): ")
+                ct_hex = cifrar_k_dinamica_hex(pt, master, nonce)
+                print("Ciphertext (HEX ASCII):")
+                print(ct_hex)
+
+            elif op == "5":
+                ct_hex = input("Ciphertext HEX: ")
+                master = input("Master key: ")
+                nonce = input("Nonce: ")
+                pt = descifrar_k_dinamica_hex(ct_hex, master, nonce)
+                print("Plaintext:")
+                print(pt)
+
+            elif op == "0":
+                print("Saliendo...")
+                break
+
+            else:
+                print("Opción inválida.")
+
+        except Exception as e:
+            print("Error:", e)
+
+
+if __name__ == "__main__":
+    menu()
