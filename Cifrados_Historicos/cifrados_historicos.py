@@ -7,7 +7,7 @@ ALFABETO_MIN = "abcdefghijklmnñopqrstuvwxyz"
 def cesar_cifrar(mensaje: str, desplazamiento: int) -> str:
     cifrado = ""
     n= len(ALFABETO_MAY)
-    shift = desplazamiento % n  # Asegura que el desplazamiento esté dentro del rango del alfabeto
+    shift = desplazamiento % n 
     for char in mensaje:
         if char in ALFABETO_MAY:
             idx = ALFABETO_MAY.index(char)
